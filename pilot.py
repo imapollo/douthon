@@ -6,7 +6,7 @@ def main():
     key = '022e300c79c18fc7068a90256d44af55'
     secret = '11c8bcbac80e8085'
     callback = 'http://www.douban.com'
-    scope = 'douban_basic_common,community_basic_user,music_basic_r'
+    scope = 'douban_basic_common,community_basic_user,book_basic_r'
 
     client = DoubanClient( key, secret, callback, scope )
 

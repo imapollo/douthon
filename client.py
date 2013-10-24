@@ -15,7 +15,7 @@ class ClientHelper():
         callback = 'http://www.douban.com'
         scope = 'douban_basic_common,community_basic_user'
         self.client = DoubanClient( key, secret, callback, scope )
-        self.client.auth_with_token( 'c863a758e0cb22f5592af60aa26168df' )
+        self.client.auth_with_token( '45a904eb8faad754d0fb0ec2af0085fc' )
 
 def main():
     helper = ClientHelper()
