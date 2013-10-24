@@ -11,7 +11,7 @@ def main():
     helper = ClientHelper()
     # print helper.client.user.me
     # print helper.client.album.liked_list( '1315244' )
-    print helper.client.user.get( '1315244' )
+    # print helper.client.user.get( '1315244' )
     print helper.client.album.get( '1371306' )
 
 if __name__ == "__main__":
