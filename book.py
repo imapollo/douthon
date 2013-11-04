@@ -1,6 +1,6 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-from douban_client import DoubanClient
 from client import ClientHelper
 
 class Album():
@@ -10,9 +10,10 @@ class Album():
 def main():
     helper = ClientHelper()
     # print helper.client.user.me
-    # print helper.client.album.liked_list( '1315244' )
     # print helper.client.user.get( '1315244' )
-    print helper.client.book.list( '1315244' )
+    # utf8stdout = open("abc", 'w')
+    # print helper.client.book.list( '1315244' )[1]['summary']
+    print helper.client.book.get( '1626392' )['summary']
 
 if __name__ == "__main__":
     main()
