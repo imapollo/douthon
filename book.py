@@ -22,9 +22,17 @@ class Book:
         for book in list:
            print book['book']['title']
 
+    def get_book_info(self, book_id):
+        return self.helper.client.book.get(book_id)
+
+    def get_book_authors(self, book_id):
+        return self.get_book_info(book_id)['author']
+
 def main():
     book = Book()
-    book.list_book_name()
+    # book.list_book_name()
+    # book.list_book_id()
+    print book.get_book_authors(1272857)[0]
 
 if __name__ == "__main__":
     main()
