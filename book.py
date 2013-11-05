@@ -2,18 +2,29 @@
 # -*- coding: utf-8 -*-
 
 from client import ClientHelper
+from user import User
 
-class Album():
-    def __init__():
-        pass
-    
+class Book:
+    def __init__(self):
+        self.helper = ClientHelper()
+        self.me = User()
+
+    def list(self):
+        return self.helper.client.book.list_all( self.me.get_current_user_id() )
+
+    def list_book_id(self):
+        list = self.list()
+        for book in list:
+            print book['book']['id']
+
+    def list_book_name(self):
+        list = self.list()
+        for book in list:
+           print book['book']['title']
+
 def main():
-    helper = ClientHelper()
-    # print helper.client.user.me
-    # print helper.client.user.get( '1315244' )
-    # utf8stdout = open("abc", 'w')
-    # print helper.client.book.list( '1315244' )[1]['summary']
-    print helper.client.book.get( '1626392' )['summary']
+    book = Book()
+    book.list_book_name()
 
 if __name__ == "__main__":
     main()
