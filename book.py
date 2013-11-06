@@ -14,13 +14,17 @@ class Book:
 
     def list_book_id(self):
         list = self.list()
+        book_id_list = []
         for book in list:
-            print book['book']['id']
+            book_id_list.append( book['book']['id'] )
+        return book_id_list
 
     def list_book_name(self):
         list = self.list()
+        book_name_list = []
         for book in list:
-           print book['book']['title']
+           bookd_name_list.append( book['book']['title'] )
+        return book_name_list
 
     def get_book_info(self, book_id):
         return self.helper.client.book.get(book_id)
@@ -30,9 +34,12 @@ class Book:
 
 def main():
     book = Book()
+    # book.list()
     # book.list_book_name()
-    # book.list_book_id()
-    print book.get_book_authors(1272857)[0]
+    user_book_collections = { book.me.get_current_user_id(): book.list_book_id() }
+    print user_book_collections
+    # print book.list_book_id()
+    # print book.get_book_authors(1272857)[0]
 
 if __name__ == "__main__":
     main()
