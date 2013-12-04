@@ -34,10 +34,10 @@ class Book:
 
 def main():
     book = Book()
-    # book.list()
+    print book.list()
     # book.list_book_name()
-    user_book_collections = { book.me.get_current_user_id(): book.list_book_id() }
-    print user_book_collections
+    # user_book_collections = { book.me.get_current_user_id(): book.list_book_id() }
+    # print user_book_collections
     # print book.list_book_id()
     # print book.get_book_authors(1272857)[0]
 
