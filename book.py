@@ -52,14 +52,14 @@ class BookHelper:
         return self.get_book_info(book_id)['author']
 
     def upsert_book_info(self, book_id):
-        book_info = self.get_book_info( book_id )
-        book = self.deserialize_book_info( book_info )
         mongodb = MongoDBClient()
         db = mongodb.db
         books = db.books
         if ( books.find_one( { "id": "%s" % book_id } ) ):
             pass
         else:
+            book_info = self.get_book_info( book_id )
+            book = self.deserialize_book_info( book_info )
             books.insert( self.serialize_book( book ) )
 
     def serialize_book( self, book ):
