@@ -31,40 +31,56 @@ class Book:
 class BookHelper:
 
     # Initate the helper.
-    def __init__(self):
+    def __init__( self ):
         self.helper = ClientHelper()
         self.me = User()
 
-    def list_user_books(self, user_id)
+    # List all the book collections for specific user.
+    def list_user_books( self, user_id )
         return self.helper.client.book.list_all( user_id )
 
-    def list(self):
+    # List all the book collections for current user.
+    def list( self ):
         return self.list_user_books( self.me.get_current_user_id() )
 
-    def list_book_id(self):
-        list = self.list()
+    # List all the book IDs for specific user.
+    def list_user_book_id( self, user_id ):
+        list = self.list_user_books( user_id )
         book_id_list = []
         for book in list:
             book_id_list.append( book['book']['id'] )
         return book_id_list
 
-    def list_book_name(self):
-        list = self.list()
+    # List all the book IDs for current user.
+    def list_book_id( self ):
+        return self.list_user_book_id( self.me.get_current_user_id() )
+
+    # List all the book names for specific user.
+    def list_user_book_names( self, user_id ):
+        list = self.list_user_books( user_id )
         book_name_list = []
         for book in list:
            bookd_name_list.append( book['book']['title'] )
         return book_name_list
 
+    # List all the book names for current user.
+    def list_book_names(self):
+        return self.list_user_book_names( self.me.get_current_user_id() )
+
+    # Get full information of a book.
     def get_book_info(self, book_id):
         return self.helper.client.book.get(book_id)
 
+    # Get the author of a book.
     def get_book_authors(self, book_id):
         return self.get_book_info(book_id)['author']
 
+    # Upsert all the book information for a user.
     def update_book_for_user(self, user_id):
         for book_id in helper.list_book_id():
             helper.upsert_book_info( book_id )
 
+    # Upsert the book information into MongoDB.
     def upsert_book_info(self, book_id):
         mongodb = MongoDBClient()
         db = mongodb.db
@@ -76,6 +92,7 @@ class BookHelper:
             book = self.deserialize_book_info( book_info )
             books.insert( self.serialize_book( book ) )
 
+    # Serialize the Book object into dictionary.
     def serialize_book( self, book ):
         book_info = {}
         book_info['id'] = book.id
@@ -94,6 +111,8 @@ class BookHelper:
         book_info['tags'] = book.tags
         return book_info
 
+    # Deserialize the book information dictionary into book
+    # Object.
     def deserialize_book_info( self, book_info ):
         book = Book()
         book.id     = book_info.get("id")
@@ -112,6 +131,7 @@ class BookHelper:
         book.tags       = book_info.get("tags")
         return book
 
+# Main.
 def main():
     helper = BookHelper()
     # helper.upsert_book_info( 1003078 )
