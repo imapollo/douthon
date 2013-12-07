@@ -5,6 +5,9 @@ from client import ClientHelper
 from mongodb import MongoDBClient
 from user import User
 
+#
+# Book object.
+#
 class Book:
 
     id = 0
@@ -22,14 +25,21 @@ class Book:
     price = 0
     pages = 0
 
+#
+# Helper class for book.
+#
 class BookHelper:
 
+    # Initate the helper.
     def __init__(self):
         self.helper = ClientHelper()
         self.me = User()
 
+    def list_user_books(self, user_id)
+        return self.helper.client.book.list_all( user_id )
+
     def list(self):
-        return self.helper.client.book.list_all( self.me.get_current_user_id() )
+        return self.list_user_books( self.me.get_current_user_id() )
 
     def list_book_id(self):
         list = self.list()
@@ -50,6 +60,10 @@ class BookHelper:
 
     def get_book_authors(self, book_id):
         return self.get_book_info(book_id)['author']
+
+    def update_book_for_user(self, user_id):
+        for book_id in helper.list_book_id():
+            helper.upsert_book_info( book_id )
 
     def upsert_book_info(self, book_id):
         mongodb = MongoDBClient()
@@ -82,20 +96,20 @@ class BookHelper:
 
     def deserialize_book_info( self, book_info ):
         book = Book()
-        book.id     = book_info.get(id)
-        book.isbn10 = book_info.get(isbn10)
-        book.isbn13 = book_info.get(isbn13)
-        book.title  = book_info.get(title)
-        book.alt    = book_info.get(alt)
-        book.image  = book_info.get(image)
-        book.price  = book_info.get(price)
-        book.pages  = book_info.get(pages)
-        book.author = book_info.get(author)
-        book.translator = book_info.get(translator)
-        book.publisher  = book_info.get(publisher)
-        book.pubdate    = book_info.get(pubdate)
-        book.rating     = book_info.get(rating)
-        book.tags       = book_info.get(tags)
+        book.id     = book_info.get("id")
+        book.title  = book_info.get("title")
+        book.isbn10 = book_info.get("isbn10")
+        book.isbn13 = book_info.get("isbn13")
+        book.alt    = book_info.get("alt")
+        book.image  = book_info.get("image")
+        book.price  = book_info.get("price")
+        book.pages  = book_info.get("pages")
+        book.author = book_info.get("author")
+        book.translator = book_info.get("translator")
+        book.publisher  = book_info.get("publisher")
+        book.pubdate    = book_info.get("pubdate")
+        book.rating     = book_info.get("rating")
+        book.tags       = book_info.get("tags")
         return book
 
 def main():
