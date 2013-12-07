@@ -1,5 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+#
+# All about books.
+#
+# author: ze.apollo@gmail.com
+#
 
 from client import ClientHelper
 from mongodb import MongoDBClient

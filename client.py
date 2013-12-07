@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 #
 # Helper to get Douban API client.
 #
@@ -9,7 +10,8 @@ from douban_client import DoubanClient
 
 class ClientHelper():
 
-    def __init__(self):
+    # Initiate the Douban API v2.0 client with OAuth.
+    def __init__( self ):
         key = '022e300c79c18fc7068a90256d44af55'
         secret = '11c8bcbac80e8085'
         callback = 'http://www.douban.com'
@@ -17,6 +19,7 @@ class ClientHelper():
         self.client = DoubanClient( key, secret, callback, scope )
         self.client.auth_with_token( 'b26a005c0aced8bd173e0114206c8a37' )
 
+# Main.
 def main():
     helper = ClientHelper()
     print helper.client.user.me
