@@ -40,6 +40,8 @@ class BookHelper:
         self.helper = ClientHelper()
         self.me = UserHelper()
 
+    # TODO move the book collection functions into book_collection.py.
+
     # List all the book collections for specific user.
     def list_user_books( self, user_id )
         return self.helper.client.book.list_all( user_id )
