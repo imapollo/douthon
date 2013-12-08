@@ -8,7 +8,7 @@
 
 from client import ClientHelper
 from mongodb import MongoDBClient
-from user import User
+from user import UserHelper
 
 #
 # Book object.
@@ -38,7 +38,7 @@ class BookHelper:
     # Initate the helper.
     def __init__( self ):
         self.helper = ClientHelper()
-        self.me = User()
+        self.me = UserHelper()
 
     # List all the book collections for specific user.
     def list_user_books( self, user_id )
@@ -69,24 +69,24 @@ class BookHelper:
         return book_name_list
 
     # List all the book names for current user.
-    def list_book_names(self):
+    def list_book_names( self ):
         return self.list_user_book_names( self.me.get_current_user_id() )
 
     # Get full information of a book.
-    def get_book_info(self, book_id):
+    def get_book_info( self, book_id ):
         return self.helper.client.book.get(book_id)
 
     # Get the author of a book.
-    def get_book_authors(self, book_id):
-        return self.get_book_info(book_id)['author']
+    def get_book_authors( self, book_id ):
+        return self.get_book_info( book_id )['author']
 
     # Upsert all the book information for a user.
-    def update_book_for_user(self, user_id):
+    def update_book_for_user( self, user_id ):
         for book_id in helper.list_book_id():
             helper.upsert_book_info( book_id )
 
     # Upsert the book information into MongoDB.
-    def upsert_book_info(self, book_id):
+    def upsert_book_info( self, book_id ):
         mongodb = MongoDBClient()
         db = mongodb.db
         books = db.books
@@ -117,7 +117,7 @@ class BookHelper:
         return book_info
 
     # Deserialize the book information dictionary into book
-    # Object.
+    # object.
     def deserialize_book_info( self, book_info ):
         book = Book()
         book.id     = book_info.get( "id" )
