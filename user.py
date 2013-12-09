@@ -95,7 +95,6 @@ def main():
     helper = UserHelper()
     # print helper.get_current_user_id()
     # print helper.get_current_user()
-    # TODO Test this!
     helper.upsert_user_info( helper.get_current_user_id() )
 
 if __name__ == "__main__":
