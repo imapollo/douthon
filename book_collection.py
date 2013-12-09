@@ -33,6 +33,7 @@ class BookCollectionHelper:
     def __init__( self ):
         self.helper = ClientHelper()
         self.user = UserHelper()
+        self.bookHelper = BookHelper()
 
     # List all the book collections for specific user.
     def list_user_books( self, user_id ):
@@ -61,15 +62,44 @@ class BookCollectionHelper:
         db = mongodb.db
         db_book_collections = db.book_collections
         user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
-        # user_b_collections = db_book_collections.find( { "user_id" : "%s" % user_b_id } )
         for user_a_collection in user_a_collections:
             user_b_collection = db_book_collections.find_one( { "user_id" : "%s" % user_b_id,
                     "book_id" : "%s" % user_a_collection.get( "book_id" ) } )
             if ( user_b_collection ):
                 self.compare_book_collection( user_a_collection, user_b_collection )
 
+    # Compare the book metadatas between 2 users.
+    def compare_book_collections_metadata( self, user_a_id, user_b_id ):
+        mongodb = MongoDBClient()
+        db = mongodb.db
+        db_book_collections = db.book_collections
+        user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
+        user_b_collections = db_book_collections.find( { "user_id" : "%s" % user_b_id } )
+        # TODO do we need to insert into DB?
+        a_authors = self.get_collection_authors( user_a_collections )
+        b_authors = self.get_collection_authors( user_b_collections )
+
+    # Get author interests for a user based on user book collection.
+    def get_collection_authors( self, book_collections ):
+        collection_authors = {}
+        for book_collection in book_collections:
+            book_collection.get("book_id")
+            authors = self.bookHelper.get_book_info( book_collection.get("book_id"))['author']
+            for author in authors:
+                # TODO remove the [] and () nationality marks in front of authors name.
+                # To emit the unnecessary diff.
+                if ( collection_authors.get( "%s" % author ) ):
+                    collection_authors["%s" % author] = collection_authors["%s" % author] + 1
+                else:
+                    collection_authors["%s" % author] = 1
+        print collection_authors;
+
+    # Check common authors for 2 users collections.
+    def compare_book_collection_authors( self, user_a_id ):
+        pass
+
     # Check if 2 users have same interesting on same book.
-    def compare_book_collection( self, user_a_collection, user_b_collection ):
+    def compare_book_collection_ratings( self, user_a_collection, user_b_collection ):
         a_rating = user_a_collection.get("rating")
         b_rating = user_b_collection.get("rating")
         if ( a_rating and b_rating ):
@@ -107,7 +137,7 @@ def main():
     helper = BookCollectionHelper()
     # helper.upsert_book_collection( helper.user.get_current_user_id() )
     # helper.upsert_book_collection( "1905602" )
-    helper.compare_book_collections( helper.user.get_current_user_id(), "1905602" )
+    helper.compare_book_collections_metadata( helper.user.get_current_user_id(), "1905602" )
 
 if __name__ == "__main__":
     main()

@@ -39,6 +39,8 @@ class BookHelper:
     def __init__( self ):
         self.helper = ClientHelper()
         self.me = UserHelper()
+        mongodb = MongoDBClient()
+        self.db = mongodb.db
 
     # TODO move the book collection functions into book_collection.py.
 
@@ -74,9 +76,18 @@ class BookHelper:
     def list_book_names( self ):
         return self.list_user_book_names( self.me.get_current_user_id() )
 
-    # Get full information of a book.
+    # Get full information of a book from Douban API.
     def get_book_info( self, book_id ):
-        return self.helper.client.book.get(book_id)
+        book_info = self.get_book_info_from_db( book_id )
+        if ( book_info ):
+            return book_info
+        else:
+            return self.helper.client.book.get(book_id)
+
+    # Get full information from MongoDB.
+    def get_book_info_from_db( self, book_id ):
+        books = self.db.books
+        return books.find_one( { "id" : "%s" % book_id } )
 
     # Get the author of a book.
     def get_book_authors( self, book_id ):
