@@ -55,6 +55,18 @@ class BookCollectionHelper:
                 book_collection = self.deserialize_book_collection_info( user_collection )
                 db_book_collections.insert( self.serialize_book_collection( book_collection ) )
 
+    # Compare the book collections between 2 users.
+    def compare_book_collections( self, user_a_id, user_b_id ):
+        mongodb = MongoDBClient()
+        db = mongodb.db
+        db_book_collections = db.book_collections
+        user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
+        # user_b_collections = db_book_collections.find( { "user_id" : "%s" % user_b_id } )
+        for user_a_collection in user_a_collections:
+            if ( db_book_collections.find_one( { "user_id" : "%s" % user_b_id,
+                    "book_id" : "%s" % user_a_collection.get( "book_id" ) } )):
+                print user_a_collection.get( "book_id" )
+
     # Serialize the Book collection object into dictionary.
     def serialize_book_collection( self, book_collection ):
         book_collection_info = {}
@@ -83,7 +95,9 @@ class BookCollectionHelper:
 # Main.
 def main():
     helper = BookCollectionHelper()
-    helper.upsert_book_collection( helper.user.get_current_user_id() )
+    # helper.upsert_book_collection( helper.user.get_current_user_id() )
+    # helper.upsert_book_collection( "1905602" )
+    helper.compare_book_collections( helper.user.get_current_user_id(), "1905602" )
 
 if __name__ == "__main__":
     main()
