@@ -78,6 +78,12 @@ class BookCollectionHelper:
         # TODO do we need to insert into DB?
         a_authors = self.get_collection_authors( user_a_collections )
         b_authors = self.get_collection_authors( user_b_collections )
+        common_authors = []
+        for a_author_key in a_authors:
+            for b_author_key in b_authors:
+                if ( a_authors[a_author_key] == b_authors[b_author_key] ):
+                    print a_author_key
+                    common_authors.append( a_authors[a_author_key] )
 
     # Get author interests for a user based on user book collection.
     def get_collection_authors( self, book_collections ):
