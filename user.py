@@ -79,15 +79,15 @@ class UserHelper:
     # object.
     def deserialize_user_info( self, user_info ):
         user = User()
-        user.id = user_info['id']
-        user.uid = user_info['uid']
-        user.name = user_info['name']
-        user.created = user_info['created']
-        user.avatar = user_info['avatar']
-        user.signature = user_info['signature']
-        user.loc_name = user_info['loc_name']
-        user.desc = user_info['desc']
-        user.alt = user_info['alt']
+        user.id = user_info.get("id")
+        user.uid = user_info.get("uid")
+        user.name = user_info.get("name")
+        user.created = user_info.get("created")
+        user.avatar = user_info.get("avatar")
+        user.signature = user_info.get("signature")
+        user.loc_name = user_info.get("loc_name")
+        user.desc = user_info.get("desc")
+        user.alt = user_info.get("alt")
         return user
 
 # Main.
