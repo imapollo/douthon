@@ -63,9 +63,19 @@ class BookCollectionHelper:
         user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
         # user_b_collections = db_book_collections.find( { "user_id" : "%s" % user_b_id } )
         for user_a_collection in user_a_collections:
-            if ( db_book_collections.find_one( { "user_id" : "%s" % user_b_id,
-                    "book_id" : "%s" % user_a_collection.get( "book_id" ) } )):
-                print user_a_collection.get( "book_id" )
+            user_b_collection = db_book_collections.find_one( { "user_id" : "%s" % user_b_id,
+                    "book_id" : "%s" % user_a_collection.get( "book_id" ) } )
+            if ( user_b_collection ):
+                self.compare_book_collection( user_a_collection, user_b_collection )
+
+    # Check if 2 users have same interesting on same book.
+    def compare_book_collection( self, user_a_collection, user_b_collection ):
+        a_rating = user_a_collection.get("rating")
+        b_rating = user_b_collection.get("rating")
+        if ( a_rating and b_rating ):
+            similar_taste = int( a_rating.get("value") ) - int( b_rating.get("value") )
+            if ( similar_taste > -2 and similar_taste < 2 ):
+                print "book id: %s" % user_a_collection.get( "book_id" )
 
     # Serialize the Book collection object into dictionary.
     def serialize_book_collection( self, book_collection ):
