@@ -88,11 +88,22 @@ class BookCollectionHelper:
         for common_author in common_authors:
             print common_author
 
+    # Get tags for a user based on user book collection.
+    def get_collection_tags( self, book_collections ):
+        collection_tags = {}
+        for book_collection in book_collections:
+            tags = self.bookHelper.get_book_info( book_collection.get("book_id"))['tags']
+            for tag in tags:
+                if ( collection_tags.get( "%s" % tag ) ):
+                    collection_tags["%s" % tag] = collection_tags["%s" % tag] + 1
+                else:
+                    collection_tags["%s" % tag] = 1
+        return collection_tags
+
     # Get author interests for a user based on user book collection.
     def get_collection_authors( self, book_collections ):
         collection_authors = {}
         for book_collection in book_collections:
-            book_collection.get("book_id")
             authors = self.bookHelper.get_book_info( book_collection.get("book_id"))['author']
             for author in authors:
                 # TODO remove the unnecessary diff.
