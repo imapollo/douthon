@@ -156,8 +156,9 @@ def main():
     # book.list_book_name()
     # user_book_collections = { book.me.get_current_user_id(): book.list_book_id() }
     # print user_book_collections
-    for book_id in helper.list_book_id():
-        helper.upsert_book_info( book_id )
+    print helper.get_book_authors( "1003078" )
+    #for book_id in helper.list_user_book_id( "1905602" ):
+    #    helper.upsert_book_info( book_id )
     # print book.get_book_authors(1272857)[0]
 
 if __name__ == "__main__":

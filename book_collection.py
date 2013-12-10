@@ -10,6 +10,7 @@ from client import ClientHelper
 from mongodb import MongoDBClient
 from user import UserHelper
 from book import BookHelper
+import re
 
 #
 # Book collection object.
@@ -81,9 +82,11 @@ class BookCollectionHelper:
         common_authors = []
         for a_author_key in a_authors:
             for b_author_key in b_authors:
-                if ( a_authors[a_author_key] == b_authors[b_author_key] ):
-                    print a_author_key
-                    common_authors.append( a_authors[a_author_key] )
+                if ( a_author_key == b_author_key ):
+                    common_authors.append( a_author_key )
+                    break
+        for common_author in common_authors:
+            print common_author
 
     # Get author interests for a user based on user book collection.
     def get_collection_authors( self, book_collections ):
@@ -92,13 +95,16 @@ class BookCollectionHelper:
             book_collection.get("book_id")
             authors = self.bookHelper.get_book_info( book_collection.get("book_id"))['author']
             for author in authors:
-                # TODO remove the [] and () nationality marks in front of authors name.
-                # To emit the unnecessary diff.
+                # TODO remove the unnecessary diff.
+                author = re.sub( r'\s*\[.*\]\s*', '', author )
+                author = re.sub( r'\s*\(.*\)\s*', '', author )
+                # erase chinese（）
+                author = re.sub( ur'\s*\uff08.*\uff09\s*', '', author )
                 if ( collection_authors.get( "%s" % author ) ):
                     collection_authors["%s" % author] = collection_authors["%s" % author] + 1
                 else:
                     collection_authors["%s" % author] = 1
-        print collection_authors;
+        return collection_authors
 
     # Check common authors for 2 users collections.
     def compare_book_collection_authors( self, user_a_id ):
