@@ -77,6 +77,11 @@ class BookCollectionHelper:
         user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
         user_b_collections = db_book_collections.find( { "user_id" : "%s" % user_b_id } )
         # TODO do we need to insert into DB?
+        self.get_common_authors( user_a_collection, user_b_collection )
+        self.get_common_tags( user_a_collection, user_b_collection )
+
+    # Get common authors for 2 different users.
+    def get_common_authors( self, user_a_collection, user_b_collection ):
         a_authors = self.get_collection_authors( user_a_collections )
         b_authors = self.get_collection_authors( user_b_collections )
         common_authors = []
@@ -88,6 +93,8 @@ class BookCollectionHelper:
         for common_author in common_authors:
             print common_author
 
+    # Get common tags for 2 different users.
+    def get_common_tags( self, user_a_collection, user_b_collection ):
         a_tags = self.get_collection_tags( user_a_collection )
         b_tags = self.get_collection_tags( user_b_collection )
         common_tags = []
