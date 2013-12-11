@@ -82,29 +82,43 @@ class BookCollectionHelper:
 
     # Get common authors for 2 different users.
     def get_common_authors( self, user_a_collection, user_b_collection ):
+        user_common_authors = {}
+        user_a_id = user_a_collections[0].get("user_id")
+        user_b_id = user_b_collections[0].get("user_id")
+        common_authors = []
         a_authors = self.get_collection_authors( user_a_collections )
         b_authors = self.get_collection_authors( user_b_collections )
-        common_authors = []
         for a_author_key in a_authors:
             for b_author_key in b_authors:
                 if ( a_author_key == b_author_key ):
                     common_authors.append( a_author_key )
+                    user_author{ "%s" % user_a_id } = a_authors{ "%s" % a_author_key }
+                    user_author{ "%s" % user_b_id } = b_authors{ "%s" % b_author_key }
+                    user_common_authors{ "%s" % a_author_key } = user_author
                     break
-        for common_author in common_authors:
-            print common_author
+        # for common_author in common_authors:
+        #     print common_author
+        return user_common_authors
 
     # Get common tags for 2 different users.
     def get_common_tags( self, user_a_collection, user_b_collection ):
+        user_common_tags = {}
+        user_a_id = user_a_collections[0].get("user_id")
+        user_b_id = user_b_collections[0].get("user_id")
+        common_tags = []
         a_tags = self.get_collection_tags( user_a_collection )
         b_tags = self.get_collection_tags( user_b_collection )
-        common_tags = []
         for a_tag_key in a_tags:
             for b_tag_key in b_tags:
                 if ( a_tag_key == b_tag_key ):
                     common_tags.append( a_tag_key )
+                    user_tag{ "%s" % user_a_id } = a_tags{ "%s" % a_tag_key }
+                    user_tag{ "%s" % user_b_id } = b_tags{ "%s" % b_tag_key }
+                    user_common_tags{ "%s" % a_tag_key } = user_tag
                     break
-        for common_tag in common_tags:
-            print common_tag
+        # for common_tag in common_tags:
+        #     print common_tag
+        return user_common_tags
 
     # Get tags for a user based on user book collection.
     def get_collection_tags( self, book_collections ):
