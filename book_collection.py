@@ -88,6 +88,17 @@ class BookCollectionHelper:
         for common_author in common_authors:
             print common_author
 
+        a_tags = self.get_collection_tags( user_a_collection )
+        b_tags = self.get_collection_tags( user_b_collection )
+        common_tags = []
+        for a_tag_key in a_tags:
+            for b_tag_key in b_tags:
+                if ( a_tag_key == b_tag_key ):
+                    common_tags.append( a_tag_key )
+                    break
+        for common_tag in common_tags:
+            print common_tag
+
     # Get tags for a user based on user book collection.
     def get_collection_tags( self, book_collections ):
         collection_tags = {}
