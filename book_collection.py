@@ -77,8 +77,9 @@ class BookCollectionHelper:
         user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
         user_b_collections = db_book_collections.find( { "user_id" : "%s" % user_b_id } )
         # TODO do we need to insert into DB?
-        self.get_common_authors( user_a_collection, user_b_collection )
-        self.get_common_tags( user_a_collection, user_b_collection )
+        # TODO test
+        user_common_authors = self.get_common_authors( user_a_collection, user_b_collection )
+        user_common_tags = self.get_common_tags( user_a_collection, user_b_collection )
 
     # Get common authors for 2 different users.
     def get_common_authors( self, user_a_collection, user_b_collection ):
