@@ -10,6 +10,8 @@ from client import ClientHelper
 from mongodb import MongoDBClient
 from user import UserHelper
 from book import BookHelper
+
+from datetime import datetime
 import re
 
 #
@@ -35,6 +37,8 @@ class BookCollectionHelper:
         self.helper = ClientHelper()
         self.user = UserHelper()
         self.bookHelper = BookHelper()
+        mongodb = MongoDBClient()
+        self.db = mongodb.db
 
     # List all the book collections for specific user.
     def list_user_books( self, user_id ):
@@ -173,6 +177,15 @@ class BookCollectionHelper:
             if ( similar_taste > -2 and similar_taste < 2 ):
                 print "book id: %s" % user_a_collection.get( "book_id" )
 
+    # Get the books read each month.
+    def get_book_read_trends( self, user_id ):
+        db_book_collections = self.db.book_collections
+        book_collections = db_book_collections.find( { "user_id" : "%s" % user_id } )
+        for book_collection in book_collections:
+            if ( book_collection["status"] == "read" ):
+                read_date = datetime.strptime( book_collection["updated"], "%Y-%m-%d %H:%M:%S")
+                print( "%d.%d" %( read_date.year, read_date.month ) )
+
     # Serialize the Book collection object into dictionary.
     def serialize_book_collection( self, book_collection ):
         book_collection_info = {}
@@ -203,7 +216,8 @@ def main():
     helper = BookCollectionHelper()
     # helper.upsert_book_collection( helper.user.get_current_user_id() )
     # helper.upsert_book_collection( "1905602" )
-    helper.compare_book_collections_metadata( helper.user.get_current_user_id(), "1905602" )
+    # helper.compare_book_collections_metadata( helper.user.get_current_user_id(), "1905602" )
+    helper.get_book_read_trends( helper.user.get_current_user_id() )
 
 if __name__ == "__main__":
     main()
