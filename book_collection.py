@@ -10,6 +10,8 @@ from client import ClientHelper
 from mongodb import MongoDBClient
 from user import UserHelper
 from book import BookHelper
+
+from datetime import datetime
 import re
 
 #
@@ -35,6 +37,8 @@ class BookCollectionHelper:
         self.helper = ClientHelper()
         self.user = UserHelper()
         self.bookHelper = BookHelper()
+        mongodb = MongoDBClient()
+        self.db = mongodb.db
 
     # List all the book collections for specific user.
     def list_user_books( self, user_id ):
@@ -74,18 +78,24 @@ class BookCollectionHelper:
         mongodb = MongoDBClient()
         db = mongodb.db
         db_book_collections = db.book_collections
+        # this will use mongo db cursor.
+        # TODO have to rewind?
         user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
         user_b_collections = db_book_collections.find( { "user_id" : "%s" % user_b_id } )
-        # TODO do we need to insert into DB?
-        # TODO test
-        user_common_authors = self.get_common_authors( user_a_collection, user_b_collection )
-        user_common_tags = self.get_common_tags( user_a_collection, user_b_collection )
+        user_common_authors = self.get_common_authors( user_a_collections, user_b_collections )
+        user_a_collections.rewind()
+        user_b_collections.rewind()
+        user_common_tags = self.get_common_tags( user_a_collections, user_b_collections )
+        print user_common_authors
+        print user_common_tags
 
     # Get common authors for 2 different users.
-    def get_common_authors( self, user_a_collection, user_b_collection ):
+    def get_common_authors( self, user_a_collections, user_b_collections ):
         user_common_authors = {}
-        user_a_id = user_a_collections[0].get("user_id")
-        user_b_id = user_b_collections[0].get("user_id")
+        user_a_collection = user_a_collections[0]
+        user_a_id = user_a_collection.get("user_id")
+        user_b_collection = user_b_collections[0]
+        user_b_id = user_b_collection.get("user_id")
         common_authors = []
         a_authors = self.get_collection_authors( user_a_collections )
         b_authors = self.get_collection_authors( user_b_collections )
@@ -93,29 +103,33 @@ class BookCollectionHelper:
             for b_author_key in b_authors:
                 if ( a_author_key == b_author_key ):
                     common_authors.append( a_author_key )
-                    user_author{ "%s" % user_a_id } = a_authors{ "%s" % a_author_key }
-                    user_author{ "%s" % user_b_id } = b_authors{ "%s" % b_author_key }
-                    user_common_authors{ "%s" % a_author_key } = user_author
+                    user_author = {}
+                    user_author[ "%s" % user_a_id ] = a_authors[ "%s" % a_author_key ]
+                    user_author[ "%s" % user_b_id ] = b_authors[ "%s" % b_author_key ]
+                    user_common_authors[ "%s" % a_author_key ] = user_author
                     break
         # for common_author in common_authors:
         #     print common_author
         return user_common_authors
 
     # Get common tags for 2 different users.
-    def get_common_tags( self, user_a_collection, user_b_collection ):
+    def get_common_tags( self, user_a_collections, user_b_collections ):
         user_common_tags = {}
-        user_a_id = user_a_collections[0].get("user_id")
-        user_b_id = user_b_collections[0].get("user_id")
+        user_a_collection = user_a_collections[0]
+        user_a_id = user_a_collection.get("user_id")
+        user_b_collection = user_b_collections[0]
+        user_b_id = user_b_collection.get("user_id")
         common_tags = []
-        a_tags = self.get_collection_tags( user_a_collection )
-        b_tags = self.get_collection_tags( user_b_collection )
+        a_tags = self.get_collection_tags( user_a_collections )
+        b_tags = self.get_collection_tags( user_b_collections )
         for a_tag_key in a_tags:
             for b_tag_key in b_tags:
                 if ( a_tag_key == b_tag_key ):
                     common_tags.append( a_tag_key )
-                    user_tag{ "%s" % user_a_id } = a_tags{ "%s" % a_tag_key }
-                    user_tag{ "%s" % user_b_id } = b_tags{ "%s" % b_tag_key }
-                    user_common_tags{ "%s" % a_tag_key } = user_tag
+                    user_tag = {}
+                    user_tag[ "%s" % user_a_id ] = a_tags[ "%s" % a_tag_key ]
+                    user_tag[ "%s" % user_b_id ] = b_tags[ "%s" % b_tag_key ]
+                    user_common_tags[ "%s" % a_tag_key ] = user_tag
                     break
         # for common_tag in common_tags:
         #     print common_tag
@@ -163,6 +177,15 @@ class BookCollectionHelper:
             if ( similar_taste > -2 and similar_taste < 2 ):
                 print "book id: %s" % user_a_collection.get( "book_id" )
 
+    # Get the books read each month.
+    def get_book_read_trends( self, user_id ):
+        db_book_collections = self.db.book_collections
+        book_collections = db_book_collections.find( { "user_id" : "%s" % user_id } )
+        for book_collection in book_collections:
+            if ( book_collection["status"] == "read" ):
+                read_date = datetime.strptime( book_collection["updated"], "%Y-%m-%d %H:%M:%S")
+                print( "%d.%d" %( read_date.year, read_date.month ) )
+
     # Serialize the Book collection object into dictionary.
     def serialize_book_collection( self, book_collection ):
         book_collection_info = {}
@@ -193,7 +216,8 @@ def main():
     helper = BookCollectionHelper()
     # helper.upsert_book_collection( helper.user.get_current_user_id() )
     # helper.upsert_book_collection( "1905602" )
-    helper.compare_book_collections_metadata( helper.user.get_current_user_id(), "1905602" )
+    # helper.compare_book_collections_metadata( helper.user.get_current_user_id(), "1905602" )
+    helper.get_book_read_trends( helper.user.get_current_user_id() )
 
 if __name__ == "__main__":
     main()
