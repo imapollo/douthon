@@ -166,6 +166,7 @@ class BookCollectionHelper:
 
     # Check common authors for 2 users collections.
     def compare_book_collection_authors( self, user_a_id ):
+        # TODO
         pass
 
     # Check if 2 users have same interesting on same book.
@@ -184,7 +185,8 @@ class BookCollectionHelper:
         for book_collection in book_collections:
             if ( book_collection["status"] == "read" ):
                 read_date = datetime.strptime( book_collection["updated"], "%Y-%m-%d %H:%M:%S")
-                print( "%d.%d: %s" %( read_date.year, read_date.month, self.bookHelper.get_book_info( book_collection["book_id"])["title"] ) )
+                book_info = self.bookHelper.get_book_info( book_collection["book_id"])
+                print( "%d.%d: %s %s" %( read_date.year, read_date.month, book_info["title"], book_info["authors"] ) )
 
     # Serialize the Book collection object into dictionary.
     def serialize_book_collection( self, book_collection ):
