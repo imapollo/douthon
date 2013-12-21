@@ -182,13 +182,49 @@ class BookCollectionHelper:
     def get_book_read_trends( self, user_id ):
         db_book_collections = self.db.book_collections
         book_collections = db_book_collections.find( { "user_id" : "%s" % user_id } )
+        months_trends = {}
         for book_collection in book_collections:
             if ( book_collection["status"] == "read" ):
                 read_date = datetime.strptime( book_collection["updated"], "%Y-%m-%d %H:%M:%S")
                 book_info = self.bookHelper.get_book_info( book_collection["book_id"])
-                print( "%d.%d: %s %s" %( read_date.year, read_date.month, book_info["title"], book_info["authors"] ) )
-                for book_tag in book_info["tags"]:
-                    print book_tag
+                month = "%04d-%02d" %( read_date.year, read_date.month )
+                print( "%s: %s %s" %( month, book_info["title"], book_info["author"][0] ) )
+                if ( month_trends.get( "%s" % month ) ):
+                    # TODO is this enough?
+                    trending_info = month_trends{ "%s" % month }
+                    trending_info_books = trending_info{ "books" }
+                    trending_info_authors = trending_info{ "authors" }
+                    trending_info_tags = trending_info{ "tags" }
+                    trending_info_books{ "%s" % book_info[ "id"] } = 1
+
+                    for book_author in book_info[ "author" ]:
+                        if ( trending_info_authors.get( "book_author") ):
+                            trending_info_authors{ "%s" % book_author } += 1
+                        else
+                            trending_info_authors{ "%s" % book_author } = 1
+
+                    for book_tag in book_info[ "tags" ]:
+                        if ( trending_info_tags.get( "book_tag") ):
+                            trending_info_tags{ "%s" % book_tag } += 1
+                        else
+                            trending_info_tags{ "%s" % book_tag } = 1
+
+                else
+                    trending_info = {}
+                    trending_info_books = {}
+                    trending_info_authors = {}
+                    trending_info_tags = {}
+                    trending_info{ "books" } = trending_info_books
+                    trending_info{ "authors" } = trending_info_authors
+                    trending_info{ "tags" } = trending_info_tags
+                    trending_info_books{ "%s" % book_info["id"] } = 1
+                    for book_author in book_info[ "author" ]:
+                        trending_info_authors{ "%s" % book_author } = 1
+                    for book_tag in book_info[ "tags" ]:
+                        trending_info_tags{ "%s" % book_tag } = 1
+                    month_trends{ "%s" % month } = trending_info
+
+        return month_trends
 
     # Serialize the Book collection object into dictionary.
     def serialize_book_collection( self, book_collection ):
