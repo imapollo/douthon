@@ -184,7 +184,7 @@ class BookCollectionHelper:
         for book_collection in book_collections:
             if ( book_collection["status"] == "read" ):
                 read_date = datetime.strptime( book_collection["updated"], "%Y-%m-%d %H:%M:%S")
-                print( "%d.%d" %( read_date.year, read_date.month ) )
+                print( "%d.%d: %s" %( read_date.year, read_date.month, self.bookHelper.get_book_info( book_collection["book_id"])["title"] ) )
 
     # Serialize the Book collection object into dictionary.
     def serialize_book_collection( self, book_collection ):
