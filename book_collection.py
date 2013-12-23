@@ -153,11 +153,7 @@ class BookCollectionHelper:
         for book_collection in book_collections:
             authors = self.bookHelper.get_book_info( book_collection.get("book_id"))['author']
             for author in authors:
-                # TODO remove the unnecessary diff.
-                author = re.sub( r'\s*\[.*\]\s*', '', author )
-                author = re.sub( r'\s*\(.*\)\s*', '', author )
-                # erase chinese（）
-                author = re.sub( ur'\s*\uff08.*\uff09\s*', '', author )
+                author = self.bookHelper.trim_book_autor( author )
                 if ( collection_authors.get( "%s" % author ) ):
                     collection_authors["%s" % author] = collection_authors["%s" % author] + 1
                 else:
@@ -188,43 +184,45 @@ class BookCollectionHelper:
                 read_date = datetime.strptime( book_collection["updated"], "%Y-%m-%d %H:%M:%S")
                 book_info = self.bookHelper.get_book_info( book_collection["book_id"])
                 month = "%04d-%02d" %( read_date.year, read_date.month )
-                print( "%s: %s %s" %( month, book_info["title"], book_info["author"][0] ) )
-                if ( month_trends.get( "%s" % month ) ):
-                    # TODO is this enough?
-                    trending_info = month_trends{ "%s" % month }
-                    trending_info_books = trending_info{ "books" }
-                    trending_info_authors = trending_info{ "authors" }
-                    trending_info_tags = trending_info{ "tags" }
-                    trending_info_books{ "%s" % book_info[ "id"] } = 1
+                if ( months_trends.get( "%s" % month ) ):
+                    trending_info = months_trends[ "%s" % month ]
+                    trending_info_books = trending_info[ "books" ]
+                    trending_info_authors = trending_info[ "authors" ]
+                    trending_info_tags = trending_info[ "tags" ]
+                    trending_info_books[ "%s" % book_info[ "id"] ] = 1
 
                     for book_author in book_info[ "author" ]:
-                        if ( trending_info_authors.get( "book_author") ):
-                            trending_info_authors{ "%s" % book_author } += 1
-                        else
-                            trending_info_authors{ "%s" % book_author } = 1
+                        book_author = self.bookHelper.trim_book_author( book_author )
+                        if ( trending_info_authors.get( book_author ) ):
+                            trending_info_authors[ book_author ] += 1
+                        else:
+                            trending_info_authors[ book_author ] = 1
 
                     for book_tag in book_info[ "tags" ]:
-                        if ( trending_info_tags.get( "book_tag") ):
-                            trending_info_tags{ "%s" % book_tag } += 1
-                        else
-                            trending_info_tags{ "%s" % book_tag } = 1
+                        book_tag = book_tag[ "title" ]
+                        if ( trending_info_tags.get( book_tag ) ):
+                            trending_info_tags[ book_tag ] += 1
+                        else:
+                            trending_info_tags[ book_tag ] = 1
 
-                else
+                else:
                     trending_info = {}
                     trending_info_books = {}
                     trending_info_authors = {}
                     trending_info_tags = {}
-                    trending_info{ "books" } = trending_info_books
-                    trending_info{ "authors" } = trending_info_authors
-                    trending_info{ "tags" } = trending_info_tags
-                    trending_info_books{ "%s" % book_info["id"] } = 1
+                    trending_info[ "books" ] = trending_info_books
+                    trending_info[ "authors" ] = trending_info_authors
+                    trending_info[ "tags" ] = trending_info_tags
+                    trending_info_books[ "%s" % book_info["id"] ] = 1
                     for book_author in book_info[ "author" ]:
-                        trending_info_authors{ "%s" % book_author } = 1
+                        book_author = self.bookHelper.trim_book_author( book_author )
+                        trending_info_authors[ "%s" % book_author ] = 1
                     for book_tag in book_info[ "tags" ]:
-                        trending_info_tags{ "%s" % book_tag } = 1
-                    month_trends{ "%s" % month } = trending_info
+                        book_tag = book_tag[ "title" ]
+                        trending_info_tags[ "%s" % book_tag ] = 1
+                    months_trends[ "%s" % month ] = trending_info
 
-        return month_trends
+        return months_trends
 
     # Serialize the Book collection object into dictionary.
     def serialize_book_collection( self, book_collection ):
@@ -257,7 +255,8 @@ def main():
     # helper.upsert_book_collection( helper.user.get_current_user_id() )
     # helper.upsert_book_collection( "1905602" )
     # helper.compare_book_collections_metadata( helper.user.get_current_user_id(), "1905602" )
-    helper.get_book_read_trends( helper.user.get_current_user_id() )
+    months = helper.get_book_read_trends( helper.user.get_current_user_id() )
+    print months
 
 if __name__ == "__main__":
     main()

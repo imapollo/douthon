@@ -10,6 +10,8 @@ from client import ClientHelper
 from mongodb import MongoDBClient
 from user import UserHelper
 
+import re
+
 #
 # Book object.
 #
@@ -109,6 +111,15 @@ class BookHelper:
             book_info = self.get_book_info( book_id )
             book = self.deserialize_book_info( book_info )
             books.insert( self.serialize_book( book ) )
+
+    # Remove unnecessary characters from the author.
+    def trim_book_author( self, author ):
+        # TODO remove the unnecessary diff.
+        author = re.sub( r'\s*\[.*\]\s*', '', author )
+        author = re.sub( r'\s*\(.*\)\s*', '', author )
+        # erase chinese（）
+        author = re.sub( ur'\s*\uff08.*\uff09\s*', '', author )
+        return author
 
     # Serialize the Book object into dictionary.
     def serialize_book( self, book ):
