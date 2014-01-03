@@ -8,6 +8,7 @@
 
 from client import ClientHelper
 from user import UserHelper
+from book_collection import BookCollectionHelper
 from mongodb import MongoDBClient
 
 class UserCommunityHelper:
@@ -39,7 +40,11 @@ class UserCommunityHelper:
 # Main.
 def main():
     helper = UserCommunityHelper()
-    print helper.get_current_user_following()
+    collectionHelper = BookCollectionHelper()
+    followings = helper.get_current_user_following()
+    for following in followings:
+        print collectionHelper.get_book_read_trends( following[ "id" ] )
+        break
 
 if __name__ == "__main__":
     main()
