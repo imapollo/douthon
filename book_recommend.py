@@ -26,9 +26,14 @@ class BookRecommender:
     # Get the reading trends for following.
     def get_following_reading_trends( self ):
         followings = self.communityHelper.get_current_user_following()
-        for following in followings:
-            print following
-            print self.collectionHelper.get_book_read_trends( following[ "id" ] )
+        self.get_common_reading_trends( followings )
+        
+    # Get the common reading trends, authors, tags etc.
+    def get_common_reading_trends( self, users ):
+        for user in users:
+            print user
+            print self.collectionHelper.get_book_read_trends( user[ "id" ] )
+            break
 
 # Main.
 def main():
