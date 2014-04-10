@@ -177,6 +177,7 @@ class BookCollectionHelper:
     # Get the books read each month.
     def get_book_read_trends( self, user_id ):
         db_book_collections = self.db.book_collections
+        self.upsert_book_collection( user_id )
         book_collections = db_book_collections.find( { "user_id" : "%s" % user_id } )
         months_trends = {}
         for book_collection in book_collections:
