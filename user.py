@@ -8,6 +8,7 @@
 
 from client import ClientHelper
 from mongodb import MongoDBClient
+from solid_data import SolidData
 
 #
 # Douban user object.
@@ -24,42 +25,33 @@ class User:
     alt = ""
 
 #
-# Helper of user.
+# Data Persistence for User.
 #
-class UserHelper:
+class UserData( SolidData ):
 
-    # Initiate user.
     def __init__( self ):
         self.helper = ClientHelper()
-        self.current_user = self.helper.client.user.me
-
-    # Get the current user ID.
-    def get_current_user_id( self ):
-        return self.current_user[ 'id' ]
-
-    # Get the json of current user.
-    def get_current_user( self ):
-        return self.current_user
-
-    # Get full information of a user from Douban API.
-    def get_user_info( self, user_id ):
-        return self.helper.client.user.get( user_id )
-
-    # Get full information for the current user from Douban API.
-    def get_current_user_info( self ):
-        return self.get_user_info( self.get_current_user() )
-
-    # Upsert the user information into MongoDB.
-    def upsert_user_info( self, user_id ):
         mongodb = MongoDBClient()
-        db = mongodb.db
-        db_users = db.users
-        if ( db_users.find_one( { "id": "%s" % user_id } ) ):
+        self.db = mongodb.db
+
+    def get_data_from_douban( self, id ):
+        user = self.helper.client.user.get( id )
+        return user
+
+    def get_data_from_mongodb( self, id ):
+        db_users = self.db.users
+        return db_users.find_one( { "id": "%s" % id } )
+
+    def upsert_data_into_mongo( self, data ):
+        db_users = self.db.users
+        if ( db_users.find_one( { "id": "%s" % data[ 'id' ] } ) ):
             pass
         else:
-            user_info = self.get_user_info( user_id )
-            user = self.deserialize_user_info( user_info )
+            user = self.deserialize_user_info( data )
             db_users.insert( self.serialize_user( user ) )
+
+    def get_current_user( self ):
+        return self.helper.client.user.me
 
     # Serialize the User object into dictionary.
     def serialize_user( self, user ):
@@ -90,12 +82,38 @@ class UserHelper:
         user.alt = user_info.get("alt")
         return user
 
+#
+# Helper of user.
+#
+class UserHelper:
+
+    # Initiate user.
+    def __init__( self ):
+        self.user_data = UserData()
+        self.current_user = self.user_data.get_current_user()
+
+    # Get the current user ID.
+    def get_current_user_id( self ):
+        return self.current_user[ 'id' ]
+
+    # Get the json of current user.
+    def get_current_user( self ):
+        return self.current_user
+
+    # Get full information of a user from Douban API.
+    def get_user_info( self, user_id ):
+        return self.user_data.get_data( user_id )
+
+    # Get full information for the current user from Douban API.
+    def get_current_user_info( self ):
+        return self.get_user_info( self.get_current_user_id() )
+
 # Main.
 def main():
     helper = UserHelper()
     # print helper.get_current_user_id()
     # print helper.get_current_user()
-    helper.upsert_user_info( helper.get_current_user_id() )
+    # helper.upsert_user_info( helper.get_current_user_id() )
 
 if __name__ == "__main__":
     main()
