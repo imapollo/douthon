@@ -17,13 +17,12 @@ class TestUserHelper( unittest.TestCase ):
 
     def setUp( self ):
         self.helper = UserHelper()
-        pass
 
     def test_get_current_user_id( self ):
         id = self.helper.get_current_user_id()
         self.assertEqual( id, '1315244' )
 
-    def test_get_user_info( self ):
+    def test_get_current_user_info( self ):
         user_info = self.helper.get_current_user_info()
         self.assertEqual( user_info[ 'id' ], '1315244' )
         self.assertEqual( user_info[ 'name' ], 'Apollo' )
