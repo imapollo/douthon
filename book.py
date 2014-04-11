@@ -8,6 +8,7 @@
 
 from client import ClientHelper
 from mongodb import MongoDBClient
+from fixed_data import FixedData
 from user import UserHelper
 
 import re
@@ -33,17 +34,79 @@ class Book:
     pages = 0
 
 #
+# Data Persistence for Book.
+#
+class BookData( FixedData ):
+
+    def __init__( self ):
+        self.helper = ClientHelper()
+        mongodb = MongoDBClient()
+        self.db = mongodb.db
+
+    def get_data_from_douban( self, id ):
+        return self.helper.client.book.get( id )
+
+    def get_data_from_mongodb( self, id ):
+        db_books = self.db.books
+        return db_books.find_one( { "id" : "%s" % id } )
+
+    def upsert_data_into_mongo( self, data ):
+        books = self.db.books
+        if ( books.find_one( { "id": "%s" % data[ 'id' ] } ) ):
+            pass
+        else:
+            book = self.deserialize_book_info( data )
+            books.insert( self.serialize_book( book ) )
+
+    # Serialize the Book object into dictionary.
+    def serialize_book( self, book ):
+        book_info = {}
+        book_info['id'] = book.id
+        book_info['isbn10'] = book.isbn10
+        book_info['isbn13'] = book.isbn13
+        book_info['title'] = book.title
+        book_info['alt'] = book.alt
+        book_info['image'] = book.image
+        book_info['price'] = book.price
+        book_info['pages'] = book.pages
+        book_info['author'] = book.author
+        book_info['translator'] = book.translator
+        book_info['publisher'] = book.publisher
+        book_info['pubdate'] = book.pubdate
+        book_info['rating'] = book.rating
+        book_info['tags'] = book.tags
+        return book_info
+
+    # Deserialize the book information dictionary into book
+    # object.
+    def deserialize_book_info( self, book_info ):
+        book = Book()
+        book.id     = book_info.get( "id" )
+        book.title  = book_info.get( "title" )
+        book.isbn10 = book_info.get( "isbn10" )
+        book.isbn13 = book_info.get( "isbn13" )
+        book.alt    = book_info.get( "alt" )
+        book.image  = book_info.get( "image" )
+        book.price  = book_info.get( "price" )
+        book.pages  = book_info.get( "pages" )
+        book.author = book_info.get( "author" )
+        book.translator = book_info.get( "translator" )
+        book.publisher  = book_info.get( "publisher" )
+        book.pubdate    = book_info.get( "pubdate" )
+        book.rating     = book_info.get( "rating" )
+        book.tags       = book_info.get( "tags" )
+        return book
+
+#
 # Helper class for book.
 #
 class BookHelper:
 
     # Initate the helper.
     def __init__( self ):
-        self.helper = ClientHelper()
+        self.book_data = BookData()
+        # TODO remove
         self.me = UserHelper()
-        mongodb = MongoDBClient()
-        self.db = mongodb.db
-
 
     # TODO move to book_collection
     # List all the book collections for specific user.
@@ -85,37 +148,11 @@ class BookHelper:
 
     # Get full information of a book from Douban API.
     def get_book_info( self, book_id ):
-        book_info = self.get_book_info_from_db( book_id )
-        if ( book_info ):
-            return book_info
-        else:
-            return self.helper.client.book.get(book_id)
-
-    # Get full information from MongoDB.
-    def get_book_info_from_db( self, book_id ):
-        books = self.db.books
-        return books.find_one( { "id" : "%s" % book_id } )
+        return self.book_data.get_data( book_id )
 
     # Get the author of a book.
     def get_book_authors( self, book_id ):
-        return self.get_book_info( book_id )['author']
-
-    # Upsert all the book information for a user.
-    def update_book_for_user( self, user_id ):
-        for book_id in helper.list_book_id():
-            helper.upsert_book_info( book_id )
-
-    # Upsert the book information into MongoDB.
-    def upsert_book_info( self, book_id ):
-        mongodb = MongoDBClient()
-        db = mongodb.db
-        books = db.books
-        if ( books.find_one( { "id": "%s" % book_id } ) ):
-            pass
-        else:
-            book_info = self.get_book_info( book_id )
-            book = self.deserialize_book_info( book_info )
-            books.insert( self.serialize_book( book ) )
+        return self.get_book_info( book_id )[ 'author' ]
 
     # Remove unnecessary characters from the author.
     def trim_book_author( self, author ):
@@ -125,45 +162,6 @@ class BookHelper:
         # erase chinese（）
         author = re.sub( ur'\s*\uff08.*\uff09\s*', '', author )
         return author
-
-    # Serialize the Book object into dictionary.
-    def serialize_book( self, book ):
-        book_info = {}
-        book_info['id'] = book.id
-        book_info['isbn10'] = book.isbn10
-        book_info['isbn13'] = book.isbn13
-        book_info['title'] = book.title
-        book_info['alt'] = book.alt
-        book_info['image'] = book.image
-        book_info['price'] = book.price
-        book_info['pages'] = book.pages
-        book_info['author'] = book.author
-        book_info['translator'] = book.translator
-        book_info['publisher'] = book.publisher
-        book_info['pubdate'] = book.pubdate
-        book_info['rating'] = book.rating
-        book_info['tags'] = book.tags
-        return book_info
-
-    # Deserialize the book information dictionary into book
-    # object.
-    def deserialize_book_info( self, book_info ):
-        book = Book()
-        book.id     = book_info.get( "id" )
-        book.title  = book_info.get( "title" )
-        book.isbn10 = book_info.get( "isbn10" )
-        book.isbn13 = book_info.get( "isbn13" )
-        book.alt    = book_info.get( "alt" )
-        book.image  = book_info.get( "image" )
-        book.price  = book_info.get( "price" )
-        book.pages  = book_info.get( "pages" )
-        book.author = book_info.get( "author" )
-        book.translator = book_info.get( "translator" )
-        book.publisher  = book_info.get( "publisher" )
-        book.pubdate    = book_info.get( "pubdate" )
-        book.rating     = book_info.get( "rating" )
-        book.tags       = book_info.get( "tags" )
-        return book
 
 # Main.
 def main():

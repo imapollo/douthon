@@ -29,7 +29,6 @@ class TestUserHelper( unittest.TestCase ):
         book_authors = self.helper.get_book_authors( '1779429' )
         self.assertTrue( 'Evi Nemeth' in book_authors )
         self.assertTrue( 'Garth Snyder' in book_authors )
-        print book_authors
 
     def tearDown( self ):
         pass
