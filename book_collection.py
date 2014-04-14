@@ -153,7 +153,7 @@ class BookCollectionHelper:
         db = mongodb.db
         db_book_collections = db.book_collections
         # this will use mongo db cursor.
-        # TODO have to rewind?
+        # have to rewind
         user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
         user_b_collections = db_book_collections.find( { "user_id" : "%s" % user_b_id } )
         user_common_authors = self.get_common_authors( user_a_collections, user_b_collections )
@@ -236,7 +236,6 @@ class BookCollectionHelper:
 
     # Check common authors for 2 users collections.
     def compare_book_collection_authors( self, user_a_id ):
-        # TODO
         pass
 
     # Check if 2 users have same interesting on same book.
