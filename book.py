@@ -119,7 +119,6 @@ class BookHelper:
 
     # Remove unnecessary characters from the author.
     def trim_book_author( self, author ):
-        # TODO remove the unnecessary diff.
         author = re.sub( r'\s*\[.*\]\s*', '', author )
         author = re.sub( r'\s*\(.*\)\s*', '', author )
         # erase chinese（）
