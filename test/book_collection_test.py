@@ -22,6 +22,16 @@ class TestBookCollectionHelper( unittest.TestCase ):
         book_collections = self.helper.list_current_user_books()
         self.assertTrue( len( book_collections ) > 400 )
 
+    def test_get_book_read_trends( self ):
+        read_trends = self.helper.get_book_read_trends( '1315244' )
+        self.assertTrue( '2011-08', read_trends )
+        self.assertTrue( '2012-10', read_trends )
+        self.assertTrue( '2013-04', read_trends )
+        read_trends_2011_08 = read_trends[ '2011-08' ]
+        self.assertTrue( '3354855' in read_trends_2011_08[ 'books' ] )
+        self.assertTrue( 'linux' in read_trends_2011_08[ 'tags' ] )
+        self.assertTrue( 'Bill Lubanovic' in read_trends_2011_08[ 'authors' ] )
+
     def tearDown( self ):
         pass
 

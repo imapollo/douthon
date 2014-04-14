@@ -125,10 +125,9 @@ class BookCollectionHelper:
         mongodb = MongoDBClient()
         db = mongodb.db
         db_book_collections = db.book_collections
-        user_a_collections = db_book_collections.find( { "user_id" : "%s" % user_a_id } )
+        user_a_collections = self.book_collection_data( user_a_id )
         for user_a_collection in user_a_collections:
-            user_b_collection = db_book_collections.find_one( { "user_id" : "%s" % user_b_id,
-                    "book_id" : "%s" % user_a_collection.get( "book_id" ) } )
+            user_b_collection = db_book_collections.find_one( { "user_id" : "%s" % user_b_id, "book_id" : "%s" % user_a_collection.get( "book_id" ) } )
             if ( user_b_collection ):
                 self.compare_book_collection( user_a_collection, user_b_collection )
 
@@ -235,9 +234,7 @@ class BookCollectionHelper:
 
     # Get the books read each month.
     def get_book_read_trends( self, user_id ):
-        db_book_collections = self.db.book_collections
-        self.upsert_book_collection( user_id )
-        book_collections = db_book_collections.find( { "user_id" : "%s" % user_id } )
+        book_collections = self.book_collection_data.get_data( user_id )
         months_trends = {}
         for book_collection in book_collections:
             if ( book_collection["status"] == "read" ):
