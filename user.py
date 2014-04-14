@@ -9,6 +9,7 @@
 from client import ClientHelper
 from mongodb import MongoDBClient
 from solid_data import SolidData
+from douban_call import douban_limited_call
 
 #
 # Douban user object.
@@ -34,6 +35,7 @@ class UserData( SolidData ):
         mongodb = MongoDBClient()
         self.db = mongodb.db
 
+    @douban_limited_call
     def get_data_from_douban( self, id ):
         user = self.helper.client.user.get( id )
         return user

@@ -10,8 +10,10 @@ from client import ClientHelper
 from mongodb import MongoDBClient
 from fixed_data import FixedData
 from user import UserHelper
+from douban_call import douban_limited_call
 
 import re
+import sys
 
 #
 # Book object.
@@ -43,6 +45,7 @@ class BookData( FixedData ):
         mongodb = MongoDBClient()
         self.db = mongodb.db
 
+    @douban_limited_call
     def get_data_from_douban( self, id ):
         return self.helper.client.book.get( id )
 

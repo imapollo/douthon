@@ -11,6 +11,7 @@ from mongodb import MongoDBClient
 from user import UserHelper
 from book import BookHelper
 from changing_data import ChangingData
+from douban_call import douban_limited_call
 
 from datetime import datetime
 import re
@@ -38,6 +39,7 @@ class BookCollectionData( ChangingData ):
         mongodb = MongoDBClient()
         self.db = mongodb.db
 
+    @douban_limited_call
     def get_data_from_douban( self, id ):
         return self.helper.client.book.list_all( id )
 
