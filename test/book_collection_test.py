@@ -22,6 +22,15 @@ class TestBookCollectionHelper( unittest.TestCase ):
         book_collections = self.helper.list_current_user_books()
         self.assertTrue( len( book_collections ) > 400 )
 
+    def test_list_book_id( self ):
+        book_ids = self.helper.list_book_id()
+        self.assertTrue( len( book_ids ) > 400 )
+        self.assertTrue( '3354855' in book_ids )
+
+    def test_list_book_names( self ):
+        book_names = self.helper.list_book_names()
+        self.assertTrue( len( book_names ) > 400 )
+
     def test_get_book_read_trends( self ):
         read_trends = self.helper.get_book_read_trends( '1315244' )
         self.assertTrue( '2011-08', read_trends )

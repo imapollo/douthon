@@ -93,6 +93,7 @@ class BookCollectionHelper:
     def __init__( self ):
         self.helper = ClientHelper()
         self.user = UserHelper()
+        self.me = UserHelper()
         self.bookHelper = BookHelper()
         mongodb = MongoDBClient()
         self.db = mongodb.db
@@ -106,19 +107,32 @@ class BookCollectionHelper:
     def list_current_user_books( self ):
         return self.list_user_books( self.user.get_current_user_id() )
 
-    # Upsert all the user collection information into MongoDB.
-    # TODO remove
-    def upsert_book_collection( self, user_id ):
-        mongodb = MongoDBClient()
-        db = mongodb.db
-        db_book_collections = db.book_collections
-        user_collections = self.list_user_books( user_id )
-        for user_collection in user_collections:
-            if ( db_book_collections.find_one( { "book_id" : "%s" % user_collection.get( "book_id" ), "user_id" : "%s" % user_id } ) ):
-                pass
-            else:
-                book_collection = self.deserialize_book_collection_info( user_collection )
-                db_book_collections.insert( self.serialize_book_collection( book_collection ) )
+    # List all the book IDs for specific user.
+    def list_user_book_id( self, user_id ):
+        list = self.list_user_books( user_id )
+        book_id_list = []
+        for book in list:
+            book_id_list.append( book[ 'book_id' ] )
+        return book_id_list
+
+    # List all the book IDs for current user.
+    def list_book_id( self ):
+        return self.list_user_book_id( self.me.get_current_user_id() )
+
+    # List all the book names for specific user.
+    def list_user_book_names( self, user_id ):
+        list = self.list_user_books( user_id )
+        book_name_list = []
+        for book in list:
+            book_id = book[ 'book_id' ]
+            book_helper = BookHelper()
+            book_name = book_helper.get_book_info( book_id )
+            book_name_list.append( book_name )
+        return book_name_list
+
+    # List all the book names for current user.
+    def list_book_names( self ):
+        return self.list_user_book_names( self.me.get_current_user_id() )
 
     # Compare the book collections between 2 users.
     def compare_book_collections( self, user_a_id, user_b_id ):

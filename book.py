@@ -105,46 +105,6 @@ class BookHelper:
     # Initate the helper.
     def __init__( self ):
         self.book_data = BookData()
-        # TODO remove
-        self.me = UserHelper()
-
-    # TODO move to book_collection
-    # List all the book collections for specific user.
-    def list_user_books( self, user_id ):
-        return self.helper.client.book.list_all( user_id )
-
-    # TODO move to book_collection
-    # List all the book collections for current user.
-    def list( self ):
-        return self.list_user_books( self.me.get_current_user_id() )
-
-    # TODO move to book_collection
-    # List all the book IDs for specific user.
-    def list_user_book_id( self, user_id ):
-        list = self.list_user_books( user_id )
-        book_id_list = []
-        for book in list:
-            book_id_list.append( book['book']['id'] )
-        return book_id_list
-
-    # TODO move too book_collection
-    # List all the book IDs for current user.
-    def list_book_id( self ):
-        return self.list_user_book_id( self.me.get_current_user_id() )
-
-    # TODO move to book_collection
-    # List all the book names for specific user.
-    def list_user_book_names( self, user_id ):
-        list = self.list_user_books( user_id )
-        book_name_list = []
-        for book in list:
-           bookd_name_list.append( book['book']['title'] )
-        return book_name_list
-
-    # TODO move to book_collection
-    # List all the book names for current user.
-    def list_book_names( self ):
-        return self.list_user_book_names( self.me.get_current_user_id() )
 
     # Get full information of a book from Douban API.
     def get_book_info( self, book_id ):
