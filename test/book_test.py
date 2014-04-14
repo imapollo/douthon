@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Tests for user.py.
+# Tests for book.py.
 #
 # author: ze.apollo@gmail.com
 #
@@ -13,7 +13,7 @@ from book import BookHelper
 import random
 import unittest
 
-class TestUserHelper( unittest.TestCase ):
+class TestBookHelper( unittest.TestCase ):
 
     def setUp( self ):
         self.helper = BookHelper()

@@ -10,6 +10,7 @@ from client import ClientHelper
 from mongodb import MongoDBClient
 from user import UserHelper
 from book import BookHelper
+from changing_data import ChangingData
 
 from datetime import datetime
 import re
@@ -28,6 +29,62 @@ class BookCollection:
     updated = ""
 
 #
+# Data Persistence for book collections.
+#
+class BookCollectionData( ChangingData ):
+
+    def __init__( self ):
+        self.helper = ClientHelper()
+        mongodb = MongoDBClient()
+        self.db = mongodb.db
+
+    def get_data_from_douban( self, id ):
+        return self.helper.client.book.list_all( id )
+
+    def get_data_from_mongodb( self, id ):
+        db_book_collections = self.db.book_collections
+        book_collections_cursor = db_book_collections.find( { "user_id" : "%s" % id } )
+        book_collections = []
+        for book_collection in book_collections_cursor:
+            book_collections.append( book_collection )
+        return book_collections
+
+    def upsert_data_into_mongo( self, data ):
+        db_book_collections = self.db.book_collections
+        user_id = data[0][ 'user_id' ]
+        for user_collection in data:
+            if ( db_book_collections.find_one( { "book_id" : "%s" % user_collection.get( "book_id" ), "user_id" : "%s" % user_id } ) ):
+                pass
+            else:
+                book_collection = self.deserialize_book_collection_info( user_collection )
+                db_book_collections.insert( self.serialize_book_collection( book_collection ) )
+
+    # Serialize the Book collection object into dictionary.
+    def serialize_book_collection( self, book_collection ):
+        book_collection_info = {}
+        book_collection_info['id'] = book_collection.id
+        book_collection_info['user_id'] = book_collection.user_id
+        book_collection_info['book_id'] = book_collection.book_id
+        book_collection_info['comment'] = book_collection.comment
+        book_collection_info['rating'] = book_collection.rating
+        book_collection_info['status'] = book_collection.status
+        book_collection_info['updated'] = book_collection.updated
+        return book_collection_info
+
+    # Deserialize the book information dictionary into book
+    # object.
+    def deserialize_book_collection_info( self, book_collection_info ):
+        book_collection = BookCollection()
+        book_collection.id = book_collection_info.get("id")
+        book_collection.user_id = book_collection_info.get("user_id")
+        book_collection.book_id = book_collection_info.get("book_id")
+        book_collection.comment = book_collection_info.get("comment")
+        book_collection.rating = book_collection_info.get("rating")
+        book_collection.status = book_collection_info.get("status")
+        book_collection.updated = book_collection_info.get("updated")
+        return book_collection
+
+#
 # Helper class for book collection.
 #
 class BookCollectionHelper:
@@ -39,16 +96,18 @@ class BookCollectionHelper:
         self.bookHelper = BookHelper()
         mongodb = MongoDBClient()
         self.db = mongodb.db
+        self.book_collection_data = BookCollectionData()
 
     # List all the book collections for specific user.
     def list_user_books( self, user_id ):
-        return self.helper.client.book.list_all( user_id )
+        return self.book_collection_data.get_data( user_id )
 
     # List all the book collections for current user.
     def list_current_user_books( self ):
         return self.list_user_books( self.user.get_current_user_id() )
 
     # Upsert all the user collection information into MongoDB.
+    # TODO remove
     def upsert_book_collection( self, user_id ):
         mongodb = MongoDBClient()
         db = mongodb.db
@@ -225,30 +284,6 @@ class BookCollectionHelper:
 
         return months_trends
 
-    # Serialize the Book collection object into dictionary.
-    def serialize_book_collection( self, book_collection ):
-        book_collection_info = {}
-        book_collection_info['id'] = book_collection.id
-        book_collection_info['user_id'] = book_collection.user_id
-        book_collection_info['book_id'] = book_collection.book_id
-        book_collection_info['comment'] = book_collection.comment
-        book_collection_info['rating'] = book_collection.rating
-        book_collection_info['status'] = book_collection.status
-        book_collection_info['updated'] = book_collection.updated
-        return book_collection_info
-
-    # Deserialize the book information dictionary into book
-    # object.
-    def deserialize_book_collection_info( self, book_collection_info ):
-        book_collection = BookCollection()
-        book_collection.id = book_collection_info.get("id")
-        book_collection.user_id = book_collection_info.get("user_id")
-        book_collection.book_id = book_collection_info.get("book_id")
-        book_collection.comment = book_collection_info.get("comment")
-        book_collection.rating = book_collection_info.get("rating")
-        book_collection.status = book_collection_info.get("status")
-        book_collection.updated = book_collection_info.get("updated")
-        return book_collection
 
 # Main.
 def main():
